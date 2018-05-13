@@ -57,11 +57,11 @@ class NodeTransSession extends EventEmitter {
     });
 
     this.ffmpeg_exec.stdout.on('data', (data) => {
-      // Logger.debug(`输出：${data}`);
+      Logger.debug(`data：${data}`);
     });
 
     this.ffmpeg_exec.stderr.on('data', (data) => {
-      // Logger.debug(`错误：${data}`);
+      Logger.debug(`err：${data}`);
     });
 
     this.ffmpeg_exec.on('close', (code) => {
@@ -88,7 +88,7 @@ class NodeTransSession extends EventEmitter {
 
     let ouPath = `${this.conf.mediaroot}/${this.conf.app}/${this.conf.stream}`;
 
-    require('child_process').exec(('ffmpeg -ss 00:00:01 -i ' + `${ouPath}/${this.fileName}.mp4` + ' -vframes 1 -q:v 2 ' + `${ouPath}/${this.fileName}.jpg`));
+    require('child_process').exec(('ffmpeg -ss 00:00:05 -i ' + `${ouPath}/${this.fileName}.mp4` + ' -vframes 1 -q:v 2 ' + `${ouPath}/${this.fileName}.jpg`));
   }
 }
 

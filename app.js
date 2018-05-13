@@ -1,4 +1,5 @@
 const NodeMediaServer = require('./node_media_server');
+const os = require('os');
 
 const config = {
   rtmp: {
@@ -24,6 +25,17 @@ const config = {
     publish: false,
     secret: 'nodemedia2017privatekey'
   },
+  trans: {
+    ffmpeg: os.platform() === 'linux' ? '/usr/bin/ffmpeg' : '/usr/local/bin/ffmpeg',
+    tasks: [
+      {
+        app: 'live',
+        ac: 'aac',
+        mp4: true,
+        mp4Flags: '[movflags=faststart]',
+      }
+    ]
+  }
 };
 
 
