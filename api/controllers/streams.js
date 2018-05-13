@@ -109,7 +109,14 @@ function getStream(req, res, next) {
   streamStats.startTime = streamStats.isLive ? publisherSession.connectTime : null;
 
   try {
-    streamStats.recordedFiles = Fs.readdirSync(`./media/${req.params.app}/${req.params.stream}`);
+    const allFiles = Fs.readdirSync(`./media/${req.params.app}/${req.params.stream}`);
+    streamStats.recordedFiles = allFiles
+    .filter(elem => /mp4/.test(elem))
+    .map(elem => ({
+      video: elem,
+      image: elem.replace('mp4', 'jpg'),
+      date: new Date(parseInt(elem.replace(/-(.*?)$/, ''), 10)) 
+    }));
   } catch (err){
     console.log(err);
   }

@@ -15,6 +15,7 @@ class NodeTransSession extends EventEmitter {
   constructor(conf) {
     super();
     this.conf = conf;
+    this.fileName = 'default';
   }
 
   run() {
@@ -25,8 +26,10 @@ class NodeTransSession extends EventEmitter {
     let mapStr = '';
     if (this.conf.mp4) {
       this.conf.mp4Flags = this.conf.mp4Flags ? this.conf.mp4Flags : '';
-      let now = new Date();
-      let mp4FileName = dateFormat('yyyy-mm-dd-HH-MM') + '.mp4';
+      let dateNow = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+      let mp4FileName = dateNow + '.mp4';
+      this.fileName = dateNow;
       let mapMp4 = `${this.conf.mp4Flags}${ouPath}/${mp4FileName}|`;
       mapStr += mapMp4;
       Logger.log('[Transmuxing MP4] ' + this.conf.streamPath + ' to ' + ouPath + '/' + mp4FileName);
@@ -82,6 +85,10 @@ class NodeTransSession extends EventEmitter {
   end() {
     // this.ffmpeg_exec.kill('SIGINT');
     this.ffmpeg_exec.stdin.write('q');
+
+    let ouPath = `${this.conf.mediaroot}/${this.conf.app}/${this.conf.stream}`;
+
+    require('child_process').exec(('ffmpeg -ss 00:00:01 -i ' + `${ouPath}/${this.fileName}.mp4` + ' -vframes 1 -q:v 2 ' + `${ouPath}/${this.fileName}.jpg`));
   }
 }
 
