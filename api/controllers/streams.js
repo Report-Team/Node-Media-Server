@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const Fs = require('fs');
 
 function getStreams(req, res, next) {
   let stats = {};
@@ -112,7 +113,7 @@ function getStream(req, res, next) {
   } catch (err){
     console.log(err);
   }
-  
+
   res.json(streamStats);
 }
 
