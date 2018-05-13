@@ -36,7 +36,7 @@ class NodeHttpServer {
       next();
     });
 
-    app.get('/:app/:stream', (req, res, next) => {
+    app.get('/info/:app/:stream', (req, res, next) => {
       Fs.readdir(`${this.mediaroot}/${req.params.app}/${req.params.stream}`, (err, files) => {
         if (err) {
           res.json([]);
