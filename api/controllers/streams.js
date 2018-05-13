@@ -91,7 +91,8 @@ function getStream(req, res, next) {
     viewers: 0,
     duration: 0,
     bitrate: 0,
-    startTime: null
+    startTime: null,
+    recordedFiles: [],
   };
 
   let publishStreamPath = `/${req.params.app}/${req.params.stream}`;
@@ -106,6 +107,12 @@ function getStream(req, res, next) {
   streamStats.bitrate = streamStats.duration > 0 ? Math.ceil(_.get(publisherSession, ['socket', 'bytesRead'], 0) * 8 / streamStats.duration / 1024) : 0;
   streamStats.startTime = streamStats.isLive ? publisherSession.connectTime : null;
 
+  try {
+    streamStats.recordedFiles = Fs.readdirSync(`./media/${req.params.app}/${req.params.stream}`);
+  } catch (err){
+    console.log(err);
+  }
+  
   res.json(streamStats);
 }
 

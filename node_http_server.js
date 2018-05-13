@@ -36,17 +36,6 @@ class NodeHttpServer {
       next();
     });
 
-    app.get('/info/:app/:stream', (req, res, next) => {
-      Fs.readdir(`${this.mediaroot}/${req.params.app}/${req.params.stream}`, (err, files) => {
-        if (err) {
-          res.json([]);
-        } else {
-          res.json({ files });
-        }
-      });
-    });
-
-
     app.all('*.flv', (req, res, next) => {
       res.setHeader('Access-Control-Allow-Origin', this.config.http.allow_origin);
       if (req.method === 'OPTIONS') {
