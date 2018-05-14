@@ -49,7 +49,7 @@ class NodeTransSession extends EventEmitter {
       Logger.log('[Transmuxing DASH] ' + this.conf.streamPath + ' to ' + ouPath + '/' + dashFileName);
     }
     mkdirp.sync(ouPath);
-    let argv = ['-y', '-fflags', 'nobuffer', '-analyzeduration', '1000000', '-i', inPath, '-c:v', vc, '-c:a', ac, '-f', 'tee', '-map', '0:a?', '-map', '0:v?', mapStr];
+    let argv = ['-y', '-i', inPath, '-c:v', vc, '-c:a', ac, '-f', 'tee', '-map', '0:a?', '-map', '0:v?', mapStr];
     // Logger.debug(argv.toString());
     this.ffmpeg_exec = spawn(this.conf.ffmpeg, argv);
     this.ffmpeg_exec.on('error', (e) => {
@@ -83,7 +83,7 @@ class NodeTransSession extends EventEmitter {
   }
 
   end() {
-    // this.ffmpeg_exec.kill('SIGINT');
+    this.ffmpeg_exec.kill('SIGINT');
     this.ffmpeg_exec.stdin.write('q');
 
     let ouPath = `${this.conf.mediaroot}/${this.conf.app}/${this.conf.stream}`;
