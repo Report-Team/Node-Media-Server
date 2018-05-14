@@ -49,47 +49,44 @@ class NodeTransSession extends EventEmitter {
       Logger.log('[Transmuxing DASH] ' + this.conf.streamPath + ' to ' + ouPath + '/' + dashFileName);
     }
     mkdirp.sync(ouPath);
-    let argv = ['-y', '-fflags', 'nobuffer', '-analyzeduration', '1000000', '-i', inPath, '-c:v', vc, '-c:a', ac, '-f', 'tee', '-map', '0:a?', '-map', '0:v?', mapStr];
+    let argv = ['-y', '-i', inPath, '-c', vc, '-f', 'mp4', `${ouPath}/${this.fileName}.mp4`];
     // Logger.debug(argv.toString());
-    this.ffmpeg_exec = spawn(this.conf.ffmpeg, argv);
+    this.ffmpeg_exec = spawn(this.conf.ffmpeg, argv, {
+      detached: true
+    });
 
-    require('child_process').exec(('ffmpeg -i ' + inPath + ' -c copy -flags +global_header -map 0 -f mp4 ' + `"${ouPath}/${this.fileName}.mp4"`), (err, out, stderr) => {
+    this.ffmpeg_exec.on('error', (e) => {
+      Logger.debug(e);
+    });
+
+    this.ffmpeg_exec.stdout.on('data', (data) => {
+      Logger.debug(`data：${data}`);
+    });
+
+    this.ffmpeg_exec.stderr.on('data', (data) => {
+      Logger.debug(`err：${data}`);
+    });
+
+    this.ffmpeg_exec.on('close', (code) => {
       Logger.log('[Transmuxing end] ' + this.conf.streamPath);
       this.emit('end');
-    })
-
-    // this.ffmpeg_exec.on('error', (e) => {
-    //   Logger.debug(e);
-    // });
-
-    // this.ffmpeg_exec.stdout.on('data', (data) => {
-    //   Logger.debug(`data：${data}`);
-    // });
-
-    // this.ffmpeg_exec.stderr.on('data', (data) => {
-    //   Logger.debug(`err：${data}`);
-    // });
-
-    // this.ffmpeg_exec.on('close', (code) => {
-    //   Logger.log('[Transmuxing end] ' + this.conf.streamPath);
-    //   this.emit('end');
-    //   fs.readdir(ouPath, function (err, files) {
-    //     if (!err) {
-    //       files.forEach((filename) => {
-    //         if (filename.endsWith('.ts')
-    //           || filename.endsWith('.m3u8')
-    //           || filename.endsWith('.mpd')
-    //           || filename.endsWith('.m4s')) {
-    //           fs.unlinkSync(ouPath + '/' + filename);
-    //         }
-    //       })
-    //     }
-    //   });
-    // });
+      fs.readdir(ouPath, function (err, files) {
+        if (!err) {
+          files.forEach((filename) => {
+            if (filename.endsWith('.ts')
+              || filename.endsWith('.m3u8')
+              || filename.endsWith('.mpd')
+              || filename.endsWith('.m4s')) {
+              fs.unlinkSync(ouPath + '/' + filename);
+            }
+          })
+        }
+      });
+    });
   }
 
   end() {
-    this.ffmpeg_exec.kill('SIGINT');
+    //this.ffmpeg_exec.kill('SIGINT');
     this.ffmpeg_exec.stdin.write('q');
 
     let ouPath = `${this.conf.mediaroot}/${this.conf.app}/${this.conf.stream}`;
