@@ -32,7 +32,9 @@ const config = {
         app: 'live',
         ac: 'aac',
         mp4: true,
-        mp4Flags: '[movflags=faststart]',
+        mp4Flags: '[movflags=faststart]',        
+        hls: true,
+        hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
       }
     ]
   }
